@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="icy-dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Antarctica Digital Twin — Bharati & Maitri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ============ HEADER BAR ============ -->
+  <header class="glass-panel header-bar">
+    <div class="header-identity">
+      <div class="station-pulse-symbol"></div>
+      <div class="identity-text">
+        <h1 id="stationHeaderTitle">BHARATI RESEARCH STATION</h1>
+        <p class="identity-sub" id="stationHeaderSub">Larsemann Hills · 69.4°S 76.2°E</p>
+      </div>
+    </div>
+
+    <div class="header-status">
+      <div class="status-badge" id="statusBadge" data-state="nominal">
+        <span class="pulse-dot"></span>
+        <span id="statusText">ALL SYSTEMS NOMINAL</span>
+      </div>
+      <div class="clock-cluster">
+        <div class="clock-item">
+          <span class="clock-label">UTC</span>
+          <span class="clock-value" id="clockUtc">--:--:--</span>
+        </div>
+        <div class="clock-item">
+          <span class="clock-label">STATION</span>
+          <span class="clock-value" id="clockStation">--:--:--</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ FLOATING RIGHT DOCK ============ -->
+  <aside class="fixed-right-dock" aria-label="Control Dock">
+    <div class="dock-switch-box" title="Toggle Bharati / Maitri">
+      <span class="dock-station-label active" id="lblBharati">BHARATI</span>
+      <label class="sketch-toggle">
+        <input type="checkbox" id="stationToggleInput">
+        <span class="sketch-track"><span class="sketch-thumb"></span></span>
+      </label>
+      <span class="dock-station-label" id="lblMaitri">MAITRI</span>
+    </div>
+
+    <div class="dock-divider"></div>
+
+    <div class="sketch-action-wrap">
+      <button class="sketch-circle-btn" id="btnAlerts" title="Notifications">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
+        </svg>
+        <span class="sketch-counter" id="alertCounter" style="display:none;">0</span>
+      </button>
+
+      <div class="sketch-dropdown glass-panel" id="alertDropdown">
+        <div class="dropdown-top">
+          <h4>Station Alerts</h4>
+          <span class="station-mini-tag" id="alertStationTag">BHARATI</span>
+        </div>
+        <div class="alert-list-items" id="alertList"></div>
+      </div>
+    </div>
+
+    <div class="dock-divider"></div>
+
+    <button class="liquid-button icon-btn" id="btnTheme" title="Toggle theme">
+      <svg viewBox="0 0 24 24" width="15" height="15">
+        <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" fill="currentColor"/>
+      </svg>
+    </button>
+
+    <div class="pill-group">
+      <button class="pill-option active" data-unit="metric">°C</button>
+      <button class="pill-option" data-unit="imperial">°F</button>
+    </div>
+  </aside>
+
+  <!-- ============ KPI GRID ============ -->
+  <section class="kpi-grid" id="kpiGrid"></section>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <main class="main-grid">
+    <div class="col col-left">
+      <!-- Environmental Sensors -->
+      <section class="glass-panel module">
+        <div class="module-head">
+          <h2>Environmental & Station Telemetry</h2>
+          <span class="module-sub">Direct Live Feed from MySQL</span>
+        </div>
+        <div class="sensor-grid" id="sensorGrid"></div>
+      </section>
+
+      <!-- Digital Twin Stage -->
+      <section class="glass-panel module">
+        <div class="module-head">
+          <h2 id="stageTitle">Digital Twin Layout</h2>
+          <div class="map-controls">
+            <label class="dim-switch" id="dimSwitch">
+              <span class="dim-label">2D</span>
+              <span class="dim-track"><span class="dim-thumb"></span></span>
+              <span class="dim-label">3D</span>
+            </label>
+          </div>
+        </div>
+        <div class="map-stage" id="mapStage">
+          <svg id="stationMap" viewBox="0 0 640 360" class="station-svg"></svg>
+        </div>
+      </section>
+
+      <!-- Operational Audit Stream -->
+      <section class="glass-panel module">
+        <div class="module-head">
+          <h2>Telemetry & Audit Stream</h2>
+        </div>
+        <div class="log-stream" id="logStream"></div>
+      </section>
+    </div>
+
+    <aside class="col col-right">
+      <!-- Active Station Meta -->
+      <section class="glass-panel module">
+        <div class="module-head">
+          <h2>Operational Status</h2>
+        </div>
+        <div class="station-meta-container" id="stationMetaContainer"></div>
+      </section>
+
+      <!-- Power & Fuel Management -->
+      <section class="glass-panel module">
+        <div class="module-head"><h2>Power & Storage Reserves</h2></div>
+        <div class="ring-row" id="ringRow"></div>
+        <div class="mix-bars" id="mixBars"></div>
+      </section>
+
+      <!-- Composite Risk Index -->
+      <section class="glass-panel module">
+        <div class="module-head">
+          <h2>Risk & Stability Index</h2>
+          <span class="risk-score-mini" id="riskMini">-- / 100</span>
+        </div>
+        <div class="risk-breakdown" id="riskBreakdown"></div>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<script src="telemetry.js"></script>
+<script src="map.js"></script>
+<script src="main.js"></script>
+<script src="api.js"></script>
+</body>
+</html>
