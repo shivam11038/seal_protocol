@@ -1,4 +1,3 @@
-
 import time
 import os
 from datetime import datetime
@@ -26,20 +25,12 @@ DATA_FILE = os.path.join(
 # =============================================================================
 # 2. MYSQL CONFIGURATION
 # =============================================================================
-#
-# IMPORTANT:
-# Replace YOUR_MYSQL_PASSWORD with your actual MySQL root password.
-#
-# Database:
-#     ant_digital_twin
-#
-# Table:
-#     Hourly_telemetry
-#
 
+# Replace YOUR_MYSQL_PASSWORD with your actual MySQL password.
 DB_URI = (
-    "mysql+pymysql://root:YOUR_MYSQL_PASSWORD"
-    "@localhost:3306/ant_digital_twin"
+    "mysql+pymysql://root:"
+    "lavanya"
+    "@localhost:3306/antarctica_digital_twin"
 )
 
 engine = create_engine(
@@ -55,7 +46,7 @@ engine = create_engine(
 
 STATIONS = ["MAITRI", "BHARATI"]
 
-# Starting resources are maintained independently for each station.
+# Independent resource state for each station
 STATION_STATE = {
     "MAITRI": {
         "fuel": 25000.0,
@@ -69,27 +60,28 @@ STATION_STATE = {
 
 
 # =============================================================================
-# 4. REAL-TIME / DEMO INTERVAL
+# 4. REAL-TIME CONFIGURATION
 # =============================================================================
 
-# 5 seconds = one simulated telemetry tick.
-#
-# For actual hourly telemetry:
-# INTERVAL_SECONDS = 3600
-
+# One telemetry cycle every 5 seconds
 INTERVAL_SECONDS = 5
 
+# Demo battery capacity
+BATTERY_CAPACITY_KWH = 500.0
+
 
 # =============================================================================
-# 5. CSV RETRY FUNCTION
+# 5. CSV WRITER
 # =============================================================================
 
-def append_with_retry(df_to_write, filepath, max_retries=10, delay=0.2):
-
-    for attempt in range(max_retries):
-
+def append_with_retry(
+    df_to_write,
+    filepath,
+    max_retries=10,
+    delay=0.2
+):
+    for _ in range(max_retries):
         try:
-
             file_exists = os.path.exists(filepath)
 
             df_to_write.to_csv(
@@ -102,11 +94,9 @@ def append_with_retry(df_to_write, filepath, max_retries=10, delay=0.2):
             return True
 
         except PermissionError:
-
             time.sleep(delay)
 
         except Exception as e:
-
             print(f"CSV write error: {e}")
             return False
 
@@ -119,25 +109,20 @@ def append_with_retry(df_to_write, filepath, max_retries=10, delay=0.2):
 
 
 # =============================================================================
-# 6. DATABASE CONNECTION TEST
+# 6. MYSQL CONNECTION TEST
 # =============================================================================
 
 def test_database_connection():
-
     try:
-
         with engine.connect() as connection:
-
             connection.execute(text("SELECT 1"))
 
         print("MySQL connection: SUCCESS")
         return True
 
     except Exception as e:
-
         print("MySQL connection: FAILED")
         print(f"Database error: {e}")
-
         return False
 
 
@@ -148,26 +133,26 @@ def test_database_connection():
 def generate_station_reading(station_id):
 
     if station_id not in STATION_STATE:
-
         raise ValueError(
             f"Unknown station '{station_id}'. "
             f"Use MAITRI or BHARATI."
         )
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # A. TIME
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     current_time = datetime.now()
-
     hour_of_day = current_time.hour
 
-    time_fraction_of_hour = INTERVAL_SECONDS / 3600.0
+    time_fraction_of_hour = (
+        INTERVAL_SECONDS / 3600.0
+    )
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # B. SCENARIO
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     scenario = np.random.choice(
         ["NORMAL", "ANOMALY", "DISASTER"],
@@ -175,13 +160,11 @@ def generate_station_reading(station_id):
     )
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # C. WEATHER
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     if scenario == "DISASTER":
-
-        # Severe Antarctic blizzard
 
         temperature = float(
             np.random.uniform(-45.0, -35.0)
@@ -201,8 +184,6 @@ def generate_station_reading(station_id):
 
     elif scenario == "ANOMALY":
 
-        # More stressful weather conditions
-
         temperature = float(
             np.random.uniform(-40.0, -20.0)
         )
@@ -221,8 +202,6 @@ def generate_station_reading(station_id):
 
     else:
 
-        # Normal Antarctic conditions
-
         temperature = float(
             np.random.uniform(-35.0, -15.0)
         )
@@ -240,21 +219,20 @@ def generate_station_reading(station_id):
         )
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # D. OCCUPANCY
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     occupancy = int(
         np.random.randint(15, 35)
     )
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # E. FOOD CONSUMPTION
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
-    # Approx. 2 kg/person/day
-    # = 0.083 kg/person/hour
+    # Approximately 2 kg/person/day
 
     food_consumed = (
         occupancy
@@ -271,13 +249,15 @@ def generate_station_reading(station_id):
     current_food = STATION_STATE[station_id]["food"]
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # F. ENERGY / POWER
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
-    # Colder temperature increases heating requirement.
+    # Colder temperatures increase heating demand.
 
-    heating_demand_kw = abs(temperature) * 2.1
+    heating_demand_kw = (
+        abs(temperature) * 2.1
+    )
 
     base_station_kw = (
         70.0
@@ -323,14 +303,9 @@ def generate_station_reading(station_id):
     )
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # G. SOLAR RADIATION
-    # -------------------------------------------------------------------------
-
-    # Approximate solar radiation in W/m².
-    #
-    # Daytime: 6 AM - 6 PM
-    # Disaster/blizzard: very low solar radiation
+    # =========================================================================
 
     if (
         6 <= hour_of_day <= 18
@@ -353,9 +328,9 @@ def generate_station_reading(station_id):
         solar_radiation = 0.0
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # H. BATTERY
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     if solar_radiation > 0:
 
@@ -372,12 +347,12 @@ def generate_station_reading(station_id):
 
         battery_level = float(
             np.clip(
-                100.0
-                - generator_load * 0.3,
+                100.0 - generator_load * 0.3,
                 15.0,
                 90.0
             )
         )
+
 
     # Disaster causes additional battery stress
 
@@ -389,11 +364,9 @@ def generate_station_reading(station_id):
         )
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # I. FUEL CONSUMPTION
-    # -------------------------------------------------------------------------
-
-    # Generator load → fuel burn rate
+    # =========================================================================
 
     fuel_burn_rate_lph = (
         generator_load * 0.38
@@ -413,9 +386,9 @@ def generate_station_reading(station_id):
     current_fuel = STATION_STATE[station_id]["fuel"]
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # J. RESOURCE FORECAST
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     hours_of_fuel_remaining = (
         current_fuel
@@ -431,9 +404,9 @@ def generate_station_reading(station_id):
     )
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # K. ANOMALY LABEL
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     if (
         scenario == "ANOMALY"
@@ -455,9 +428,9 @@ def generate_station_reading(station_id):
         occurring_anomaly = "NONE"
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # L. DISASTER LABEL
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     if scenario == "DISASTER":
 
@@ -476,9 +449,9 @@ def generate_station_reading(station_id):
         disaster_label = "NONE"
 
 
-    # -------------------------------------------------------------------------
-    # M. PREDICTIVE RISK
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # M. PREDICTIVE ANOMALY
+    # =========================================================================
 
     if hours_of_fuel_remaining < 48:
 
@@ -500,9 +473,9 @@ def generate_station_reading(station_id):
         predicted_anomaly = "NONE"
 
 
-    # -------------------------------------------------------------------------
-    # N. OVERALL RISK SCORE
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # N. RISK SCORE
+    # =========================================================================
 
     risk_score = 0
 
@@ -546,89 +519,225 @@ def generate_station_reading(station_id):
         risk_status = "NORMAL"
 
 
-    # -------------------------------------------------------------------------
-    # O. DATA RECORD
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # O. ENERGY / FUEL FORECASTS
+    # =========================================================================
+
+    energy_remaining_kwh = (
+        battery_level / 100.0
+    ) * BATTERY_CAPACITY_KWH
+
+    energy_consumption_per_day_kwh = (
+        total_power_kw * 24.0
+    )
+
+    energy_endurance_days = (
+        energy_remaining_kwh
+        / max(
+            energy_consumption_per_day_kwh,
+            0.001
+        )
+    )
+
+    fuel_consumption_per_day_litres = (
+        fuel_burn_rate_lph * 24.0
+    )
+
+    fuel_endurance_days = (
+        current_fuel
+        / max(
+            fuel_consumption_per_day_litres,
+            0.001
+        )
+    )
+
+    predicted_energy_kwh = (
+        energy_consumed_kwh * 1.05
+    )
+
+
+    # =========================================================================
+    # P. RESOURCE STATUS
+    # =========================================================================
+
+    if energy_endurance_days < 1:
+
+        energy_status = "CRITICAL"
+
+    elif energy_endurance_days < 3:
+
+        energy_status = "WARNING"
+
+    else:
+
+        energy_status = "NORMAL"
+
+
+    if fuel_endurance_days < 2:
+
+        fuel_status = "CRITICAL"
+
+    elif fuel_endurance_days < 7:
+
+        fuel_status = "WARNING"
+
+    else:
+
+        fuel_status = "NORMAL"
+
+
+    # =========================================================================
+    # Q. BINARY ANOMALY PREDICTION
+    # =========================================================================
+
+    anomaly_prediction = (
+        1
+        if predicted_anomaly != "NONE"
+        else 0
+    )
+
+
+    # =========================================================================
+    # R. FUEL RECOMMENDATION
+    # =========================================================================
+
+    # 7 days projected consumption + 10% safety margin
+
+    recommended_fuel_litres = (
+        fuel_consumption_per_day_litres
+        * 7.0
+        * 1.10
+    )
+
+    additional_fuel_required_litres = max(
+        0.0,
+        recommended_fuel_litres - current_fuel
+    )
+
+
+    # =========================================================================
+    # S. MYSQL DATA RECORD
+    # =========================================================================
+
+    # These names EXACTLY match the MySQL predictions table.
 
     record = {
 
-        "timestamp":
-            current_time.strftime(
-                "%Y-%m-%d %H:%M:%S"
-            ),
+        "timestamp": current_time.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
 
-        "station_id":
-            station_id,
+        "station_id": station_id,
 
-        # Weather
+        "temperature_celsius": round(
+            temperature,
+            2
+        ),
 
-        "Temperature":
-            round(temperature, 2),
+        "wind_speed_knots": round(
+            wind_speed,
+            2
+        ),
 
-        "Wind_Speed":
-            round(wind_speed, 2),
+        "pressure_hpa": round(
+            pressure,
+            2
+        ),
 
-        "Pressure":
-            round(pressure, 2),
+        "humidity_percent": round(
+            humidity,
+            2
+        ),
 
-        "Humidity":
-            round(humidity, 2),
+        "solar_radiation_wm2": round(
+            solar_radiation,
+            2
+        ),
 
-        "Solar_Radiation":
-            round(solar_radiation, 2),
+        "generator_load_percent": round(
+            generator_load,
+            2
+        ),
 
-        # Energy
+        "energy_consumed_kwh": round(
+            energy_consumed_kwh,
+            2
+        ),
 
-        "Generator_Load":
-            round(generator_load, 2),
+        "battery_level_percent": round(
+            battery_level,
+            2
+        ),
 
-        "Energy_consumption":
-            round(energy_consumed_kwh, 2),
+        "fuel_level_liters": round(
+            current_fuel,
+            2
+        ),
 
-        "Battery_Level":
-            round(battery_level, 2),
+        "fuel_burn_rate_lph": round(
+            fuel_burn_rate_lph,
+            2
+        ),
 
-        # Resources
+        "food_inventory_kg": round(
+            current_food,
+            2
+        ),
 
-        "Fuel_Level":
-            round(current_fuel, 2),
+        "station_occupancy": occupancy,
 
-        "Fuel_Burn_Rate":
-            round(fuel_burn_rate_lph, 2),
+        "predicted_energy_kwh": round(
+            predicted_energy_kwh,
+            2
+        ),
 
-        "Food_Inventory":
-            round(current_food, 2),
+        "anomaly_prediction": anomaly_prediction,
 
-        "Occupancy":
-            occupancy,
+        "anomaly_status": occurring_anomaly,
 
-        # ML / Prediction
+        "energy_remaining_kwh": round(
+            energy_remaining_kwh,
+            2
+        ),
 
-        "scenario":
-            scenario,
+        "energy_consumption_per_day_kwh": round(
+            energy_consumption_per_day_kwh,
+            2
+        ),
 
-        "occurring_anomaly":
-            occurring_anomaly,
+        "energy_endurance_days": round(
+            energy_endurance_days,
+            2
+        ),
 
-        "predicted_anomaly":
-            predicted_anomaly,
+        "fuel_consumption_per_day_litres": round(
+            fuel_consumption_per_day_litres,
+            2
+        ),
 
-        "disaster_label":
-            disaster_label,
+        "fuel_endurance_days": round(
+            fuel_endurance_days,
+            2
+        ),
 
-        "fuel_hours_remaining":
-            round(hours_of_fuel_remaining, 2),
+        "risk_score": risk_score,
 
-        "food_hours_remaining":
-            round(hours_of_food_remaining, 2),
+        "risk_status": risk_status,
 
-        "risk_score":
-            risk_score,
+        "recommended_fuel_litres": round(
+            recommended_fuel_litres,
+            2
+        ),
 
-        "risk_status":
-            risk_status
+        "additional_fuel_required_litres": round(
+            additional_fuel_required_litres,
+            2
+        ),
+
+        "energy_status": energy_status,
+
+        "fuel_status": fuel_status
     }
-
 
     return pd.DataFrame([record])
 
@@ -642,8 +751,8 @@ def write_to_mysql(telemetry_df):
     try:
 
         telemetry_df.to_sql(
-            "Hourly_telemetry",
-            engine,
+            "predictions",
+            con=engine,
             if_exists="append",
             index=False,
             method="multi"
@@ -653,7 +762,9 @@ def write_to_mysql(telemetry_df):
 
     except Exception as e:
 
-        print(f" -> MySQL write failed: {e}")
+        print(
+            f" -> MySQL write failed: {e}"
+        )
 
         return False
 
@@ -666,7 +777,9 @@ if __name__ == "__main__":
 
     print("=" * 80)
 
-    print(" ANTARCTIC DIGITAL TWIN - REAL-TIME TELEMETRY")
+    print(
+        " ANTARCTIC DIGITAL TWIN - REAL-TIME TELEMETRY"
+    )
 
     print("=" * 80)
 
@@ -675,7 +788,8 @@ if __name__ == "__main__":
     )
 
     print(
-        f"Telemetry interval: {INTERVAL_SECONDS} seconds"
+        f"Telemetry interval: "
+        f"{INTERVAL_SECONDS} seconds"
     )
 
     print(
@@ -685,9 +799,9 @@ if __name__ == "__main__":
     print("=" * 80)
 
 
-    # -------------------------------------------------------------------------
-    # Test MySQL before starting
-    # -------------------------------------------------------------------------
+    # =========================================================================
+    # DATABASE TEST
+    # =========================================================================
 
     db_available = test_database_connection()
 
@@ -714,28 +828,30 @@ if __name__ == "__main__":
     )
 
 
-    # -------------------------------------------------------------------------
+    # =========================================================================
     # REAL-TIME LOOP
-    # -------------------------------------------------------------------------
+    # =========================================================================
 
     try:
 
         while True:
 
-            # Generate one reading for EACH station
+            # Generate data for both stations
 
             for station in STATIONS:
 
-                telemetry_df = generate_station_reading(
-                    station_id=station
+                telemetry_df = (
+                    generate_station_reading(
+                        station_id=station
+                    )
                 )
 
-
-                # -------------------------------------------------------------
-                # Console
-                # -------------------------------------------------------------
-
                 row = telemetry_df.iloc[0]
+
+
+                # =================================================================
+                # CONSOLE OUTPUT
+                # =================================================================
 
                 print("=" * 80)
 
@@ -745,31 +861,38 @@ if __name__ == "__main__":
                 )
 
                 print(
-                    f"Scenario       : {row['scenario']}"
+                    f"Scenario       : "
+                    f"{row['anomaly_status']}"
                 )
 
                 print(
-                    f"Temperature    : {row['Temperature']} °C"
+                    f"Temperature    : "
+                    f"{row['temperature_celsius']} °C"
                 )
 
                 print(
-                    f"Wind Speed     : {row['Wind_Speed']} knots"
+                    f"Wind Speed     : "
+                    f"{row['wind_speed_knots']} knots"
                 )
 
                 print(
-                    f"Generator Load : {row['Generator_Load']} %"
+                    f"Generator Load : "
+                    f"{row['generator_load_percent']} %"
                 )
 
                 print(
-                    f"Battery        : {row['Battery_Level']} %"
+                    f"Battery        : "
+                    f"{row['battery_level_percent']} %"
                 )
 
                 print(
-                    f"Fuel           : {row['Fuel_Level']} L"
+                    f"Fuel           : "
+                    f"{row['fuel_level_liters']} L"
                 )
 
                 print(
-                    f"Food           : {row['Food_Inventory']} kg"
+                    f"Food           : "
+                    f"{row['food_inventory_kg']} kg"
                 )
 
                 print(
@@ -780,18 +903,18 @@ if __name__ == "__main__":
 
                 print(
                     f"Anomaly        : "
-                    f"{row['occurring_anomaly']}"
+                    f"{row['anomaly_status']}"
                 )
 
                 print(
                     f"Prediction     : "
-                    f"{row['predicted_anomaly']}"
+                    f"{row['anomaly_prediction']}"
                 )
 
 
-                # -------------------------------------------------------------
+                # =================================================================
                 # CSV BACKUP
-                # -------------------------------------------------------------
+                # =================================================================
 
                 csv_success = append_with_retry(
                     telemetry_df,
@@ -811,14 +934,16 @@ if __name__ == "__main__":
                     )
 
 
-                # -------------------------------------------------------------
+                # =================================================================
                 # MYSQL
-                # -------------------------------------------------------------
+                # =================================================================
 
                 if db_available:
 
-                    mysql_success = write_to_mysql(
-                        telemetry_df
+                    mysql_success = (
+                        write_to_mysql(
+                            telemetry_df
+                        )
                     )
 
                     if mysql_success:
@@ -827,10 +952,13 @@ if __name__ == "__main__":
                             " -> MySQL: Saved"
                         )
 
+
                 print()
 
 
-            # Wait before next telemetry cycle
+            # =====================================================================
+            # WAIT
+            # =====================================================================
 
             print(
                 f"Next telemetry cycle in "
@@ -845,8 +973,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
 
         print(
-            "\n"
-            + "=" * 80
+            "\n" + "=" * 80
         )
 
         print(
@@ -856,4 +983,3 @@ if __name__ == "__main__":
         print(
             "=" * 80
         )
-
