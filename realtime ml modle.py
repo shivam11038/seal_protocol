@@ -20,7 +20,12 @@ warnings.filterwarnings("ignore")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-INPUT_FILE = os.path.join(BASE_DIR, "Hourly_antarctic_telemetry.csv")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+INPUT_FILE = os.path.join(
+    DATA_DIR,
+    "Hourly_antarctic_telemetry.csv"
+)
 OUTPUT_FILE = os.path.join(BASE_DIR, "Antarctic Digital Twin Prediction.csv")
 
 ENERGY_MODEL_FILE = os.path.join(BASE_DIR, "energy_model.joblib")
@@ -32,8 +37,8 @@ ANOMALY_MODEL_FILE = os.path.join(BASE_DIR, "anomaly_model.joblib")
 MYSQL_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "12345",
-    "database": "BHOSDI",
+    "password": "lavanya",
+    "database": "antarctica_digital_twin",
 }
 
 # -------------------------
