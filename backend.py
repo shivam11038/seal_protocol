@@ -124,14 +124,35 @@ def get_telemetry_history(
         )
 
 
+from fastapi.responses import FileResponse
 @app.get("/")
 def root():
-    return {
-        "status": "online",
-        "service": "Antarctica Telemetry API"
-    }
+    return FileResponse("index.html")
 
 
+@app.get("/styles.css")
+def styles():
+    return FileResponse("styles.css")
+
+
+@app.get("/main.js")
+def main_js():
+    return FileResponse("main.js")
+
+
+@app.get("/map.js")
+def map_js():
+    return FileResponse("map.js")
+
+
+@app.get("/telemetry.js")
+def telemetry_js():
+    return FileResponse("telemetry.js")
+
+
+@app.get("/api.js")
+def api_js():
+    return FileResponse("api.js")
 @app.get("/api/health")
 def health_check(db: Session = Depends(get_db)):
     try:
