@@ -179,6 +179,16 @@
     `).join("");
   }
 
+  const btnProfile = document.getElementById("btnProfile");
+const profileDropdown = document.getElementById("profileDropdown");
+
+btnProfile.addEventListener("click", (e) => {
+  e.stopPropagation();
+  profileDropdown.classList.toggle("open");
+});
+document.addEventListener("click", () => profileDropdown.classList.remove("open"));
+profileDropdown.addEventListener("click", (e) => e.stopPropagation());
+
   function renderLogs() {
     const logs = Telemetry.logs.slice(-20);
     document.getElementById("logStream").innerHTML = logs.map(l => `
@@ -226,6 +236,17 @@
     });
   }
 
+  const btnPause = document.getElementById("btnPauseTelemetry");
+  if (btnPause) {
+    btnPause.addEventListener("click", () => {
+      const paused = API.togglePause();
+      btnPause.classList.toggle("active", paused);
+      btnPause.innerHTML = paused
+        ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`
+        : `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+    });
+  }
+
   StationMap.build(document.getElementById("stationMap"), null);
 
   const dimSwitch = document.getElementById("dimSwitch");
@@ -242,6 +263,7 @@
     const stTime = new Date(now.getTime() + 5 * 3600000);
     document.getElementById("clockStation").textContent = stTime.toISOString().substring(11, 19);
   }
+  
   setInterval(tickClock, 1000);
   tickClock();
 

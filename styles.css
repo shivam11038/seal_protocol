@@ -26,8 +26,8 @@
   --radius-md: 16px;
   --radius-sm: 10px;
 
-  --blur-glass: 18px;
-  --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  --blur-glass: 4px;
+  --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 html[data-theme="frost-light"] {
@@ -96,6 +96,7 @@ html[data-theme="frost-light"] .glass-panel {
   position: relative; z-index: 1;
   max-width: 1600px; margin: 0 auto;
   padding: 1.25rem 1.5rem 3rem;
+  padding-right: 5.5rem;
   display: flex; flex-direction: column; gap: 1.1rem;
 }
 
@@ -150,7 +151,7 @@ html[data-theme="frost-light"] .glass-panel {
    ========================================================================= */
 .fixed-right-dock {
   position: fixed !important;
-  right: 1.25rem !important;
+  right: .75rem !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
   display: flex !important;

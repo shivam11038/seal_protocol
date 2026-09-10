@@ -3,6 +3,8 @@
    ========================================================================= */
 
 const Telemetry = (() => {
+
+  
   const STATIONS = {
     bharati: {
       name: "BHARATI RESEARCH STATION",
@@ -103,7 +105,15 @@ const Telemetry = (() => {
     if (incoming.power) Object.assign(s.power, incoming.power);
     if (incoming.risk) Object.assign(s.risk, incoming.risk);
     if (incoming.stationStatus) s.stationStatus = incoming.stationStatus;
-    if (incoming.alerts) s.alerts = incoming.alerts;
+    if (incoming.alerts && incoming.alerts.length > 0) {
+      incoming.alerts.forEach(newAlert => {
+        const exists = s.alerts.some(a => a.id === newAlert.id);
+        if (!exists) {
+          s.alerts.unshift(newAlert);
+        }
+      });
+      if (s.alerts.length > 30) s.alerts.length = 30;
+    }
     if (incoming.occupancy !== undefined) s.occupancy = incoming.occupancy;
 
     emit("tick", s);
@@ -121,6 +131,8 @@ const Telemetry = (() => {
       return `${i === 0 ? "M" : "L"}${x},${y}`;
     }).join(" ");
   }
+
+  
 
   return {
     on,

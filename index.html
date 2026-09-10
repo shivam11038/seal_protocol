@@ -24,6 +24,11 @@
     </div>
 
     <div class="header-status">
+      <button id="btnPauseTelemetry" class="liquid-button icon-btn" title="Pause/Resume Stream">
+    <svg id="pauseIcon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+    </svg>
+  </button>
       <div class="status-badge" id="statusBadge" data-state="nominal">
         <span class="pulse-dot"></span>
         <span id="statusText">ALL SYSTEMS NOMINAL</span>
@@ -68,6 +73,28 @@
           <span class="station-mini-tag" id="alertStationTag">BHARATI</span>
         </div>
         <div class="alert-list-items" id="alertList"></div>
+      </div>
+    </div>
+
+     <div class="dock-divider"></div>
+
+    <div class="sketch-action-wrap">
+      <button class="sketch-circle-btn" id="btnProfile" title="Operator Profile">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+      </button>
+
+      <!-- Flyout Drawer/Card -->
+      <div class="sketch-dropdown glass-panel" id="profileDropdown">
+        <div class="profile-card-content">
+          <div class="profile-avatar-letter">OP</div>
+          <div class="profile-text">
+            <div class="p-name">Ved Prakash Sharma</div>
+            <div class="p-role">Station Controller</div>
+            <div class="p-id">ID: NCPOR-8821</div>
+          </div>
+        </div>
       </div>
     </div>
 

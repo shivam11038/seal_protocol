@@ -5,6 +5,12 @@
 const API = (() => {
   const ENDPOINT = "http://127.0.0.1:8000/api/telemetry/latest";
 
+  let isPaused = false;
+  function togglePause() {
+    isPaused = !isPaused;
+    return isPaused;
+  }
+
   function mapRowToDashboard(row) {
     const windSpeedMs = (parseFloat(row.wind_speed_knots) || 0) * 0.514444;
     const isAnomaly = parseInt(row.anomaly_prediction) === 1 || 
@@ -13,10 +19,10 @@ const API = (() => {
     const alerts = [];
     if (isAnomaly) {
       alerts.push({
-        id: "anomaly-alert",
+        id: `anomaly-${Date.now()}`,
         title: `Anomaly: ${row.anomaly_status || "Irregular pattern detected"}`,
         level: "crit",
-        time: "Realtime"
+        time: new Date().toLocaleTimeString([], { hour12: false })
       });
     }
 
@@ -69,9 +75,12 @@ const API = (() => {
         }
       }
     };
+    
   }
 
   async function poll() {
+    if (isPaused) return;
+
     const key = Telemetry.getActiveStationKey();
     try {
       const res = await fetch(`${ENDPOINT}?station_id=${encodeURIComponent(key)}`);
@@ -88,5 +97,6 @@ const API = (() => {
   setInterval(poll, 2000);
   poll();
 
-  return { poll };
+  // UPDATE RETURN STATEMENT TO INCLUDE togglePause:
+  return { poll, togglePause };
 })();
