@@ -263,6 +263,14 @@ profileDropdown.addEventListener("click", (e) => e.stopPropagation());
     const stTime = new Date(now.getTime() + 5 * 3600000);
     document.getElementById("clockStation").textContent = stTime.toISOString().substring(11, 19);
   }
+
+  const btnClearAlerts = document.getElementById("btnClearAlerts");
+if (btnClearAlerts) {
+  btnClearAlerts.addEventListener("click", (e) => {
+    e.stopPropagation();
+    Telemetry.clearAlerts();
+  });
+}
   
   setInterval(tickClock, 1000);
   tickClock();

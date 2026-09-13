@@ -15,6 +15,8 @@
 
   <!-- ============ HEADER BAR ============ -->
   <header class="glass-panel header-bar">
+    <img src="33GIF-ezgif.com-crop.png" alt="Station Penguin Mascot" class="header-penguin" />
+
     <div class="header-identity">
       <div class="station-pulse-symbol"></div>
       <div class="identity-text">
@@ -47,7 +49,8 @@
   </header>
 
   <!-- ============ FLOATING RIGHT DOCK ============ -->
-  <aside class="fixed-right-dock" aria-label="Control Dock">
+<aside class="fixed-right-dock" aria-label="Control Dock">
+    <!-- Station Selector -->
     <div class="dock-switch-box" title="Toggle Bharati / Maitri">
       <span class="dock-station-label active" id="lblBharati">BHARATI</span>
       <label class="sketch-toggle">
@@ -59,6 +62,7 @@
 
     <div class="dock-divider"></div>
 
+    <!-- Notifications Trigger -->
     <div class="sketch-action-wrap">
       <button class="sketch-circle-btn" id="btnAlerts" title="Notifications">
         <svg viewBox="0 0 24 24" width="16" height="16">
@@ -70,14 +74,18 @@
       <div class="sketch-dropdown glass-panel" id="alertDropdown">
         <div class="dropdown-top">
           <h4>Station Alerts</h4>
-          <span class="station-mini-tag" id="alertStationTag">BHARATI</span>
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <button id="btnClearAlerts" class="clear-alerts-btn" title="Clear all alerts">Clear</button>
+            <span class="station-mini-tag" id="alertStationTag">BHARATI</span>
+          </div>
         </div>
         <div class="alert-list-items" id="alertList"></div>
       </div>
     </div>
 
-     <div class="dock-divider"></div>
+    <div class="dock-divider"></div>
 
+    <!-- Operator Profile -->
     <div class="sketch-action-wrap">
       <button class="sketch-circle-btn" id="btnProfile" title="Operator Profile">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -85,7 +93,6 @@
         </svg>
       </button>
 
-      <!-- Flyout Drawer/Card -->
       <div class="sketch-dropdown glass-panel" id="profileDropdown">
         <div class="profile-card-content">
           <div class="profile-avatar-letter">OP</div>
@@ -100,12 +107,16 @@
 
     <div class="dock-divider"></div>
 
-    <button class="liquid-button icon-btn" id="btnTheme" title="Toggle theme">
+    <!-- Theme Switcher -->
+    <button class="sketch-circle-btn" id="btnTheme" title="Toggle theme">
       <svg viewBox="0 0 24 24" width="15" height="15">
         <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" fill="currentColor"/>
       </svg>
     </button>
 
+    <div class="dock-divider"></div>
+
+    <!-- Units Toggle -->
     <div class="pill-group">
       <button class="pill-option active" data-unit="metric">°C</button>
       <button class="pill-option" data-unit="imperial">°F</button>

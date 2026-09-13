@@ -3,8 +3,6 @@
    ========================================================================= */
 
 const Telemetry = (() => {
-
-  
   const STATIONS = {
     bharati: {
       name: "BHARATI RESEARCH STATION",
@@ -13,6 +11,7 @@ const Telemetry = (() => {
       startedAt: Date.now() - 3600000 * 8,
       occupancy: 0,
       alerts: [],
+      dismissedAlerts: new Set(),
       sensors: {
         outsideTemp: { label: "Outside Temp", unit: "°C", value: 0, min: -60, max: 10, history: [0] },
         windSpeed:   { label: "Wind Speed", unit: "m/s", value: 0, min: 0, max: 45, history: [0] },
@@ -41,6 +40,7 @@ const Telemetry = (() => {
       startedAt: Date.now() - 3600000 * 14,
       occupancy: 0,
       alerts: [],
+      dismissedAlerts: new Set(),
       sensors: {
         outsideTemp: { label: "Outside Temp", unit: "°C", value: 0, min: -60, max: 10, history: [0] },
         windSpeed:   { label: "Wind Speed", unit: "m/s", value: 0, min: 0, max: 45, history: [0] },
@@ -88,6 +88,16 @@ const Telemetry = (() => {
     emit("log", entry);
   }
 
+  function clearAlerts() {
+    const s = STATIONS[activeStationKey];
+    if (s) {
+      s.alerts.forEach(a => s.dismissedAlerts.add(a.id));
+      s.alerts = [];
+      addLog("SYSTEM", `Cleared notifications for ${s.name.split(" ")[0]}`);
+      emit("tick", s);
+    }
+  }
+
   function pushBackendTelemetry(stationKey, incoming) {
     if (!STATIONS[stationKey]) return;
     const s = STATIONS[stationKey];
@@ -105,15 +115,18 @@ const Telemetry = (() => {
     if (incoming.power) Object.assign(s.power, incoming.power);
     if (incoming.risk) Object.assign(s.risk, incoming.risk);
     if (incoming.stationStatus) s.stationStatus = incoming.stationStatus;
+
     if (incoming.alerts && incoming.alerts.length > 0) {
       incoming.alerts.forEach(newAlert => {
+        const isDismissed = s.dismissedAlerts.has(newAlert.id);
         const exists = s.alerts.some(a => a.id === newAlert.id);
-        if (!exists) {
+        if (!exists && !isDismissed) {
           s.alerts.unshift(newAlert);
         }
       });
       if (s.alerts.length > 30) s.alerts.length = 30;
     }
+
     if (incoming.occupancy !== undefined) s.occupancy = incoming.occupancy;
 
     emit("tick", s);
@@ -132,8 +145,6 @@ const Telemetry = (() => {
     }).join(" ");
   }
 
-  
-
   return {
     on,
     getActiveStation,
@@ -142,6 +153,7 @@ const Telemetry = (() => {
     pushBackendTelemetry,
     sparkPath,
     addLog,
+    clearAlerts,
     get logs() { return logs; }
   };
 })();
