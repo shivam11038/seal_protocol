@@ -190,7 +190,65 @@
       </section>
     </aside>
   </main>
+  <div id="assetModal" class="asset-modal-backdrop">
+  <div class="glass-panel asset-modal-card">
+    <div class="modal-header">
+      <div>
+        <div class="modal-tags">
+          <span class="modal-badge-cat" id="modalCategory">HABITAT & OPERATIONS</span>
+          <span class="modal-station-tag" id="modalStationTag">BHARATI</span>
+        </div>
+        <h3 id="modalTitle">Monolith Main Complex</h3>
+        <span class="modal-id" id="modalId">ID: bharati-main</span>
+      </div>
+      <button id="btnCloseModal" class="modal-close-btn">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Status & Health -->
+      <div class="modal-grid-2">
+        <div class="modal-stat-box" id="modalStatusBox">
+          <span class="stat-box-label">OPERATIONAL STATUS</span>
+          <div class="stat-box-val status-val">
+            <span class="pulse-dot" id="modalStatusDot"></span>
+            <span id="modalStatusText">NOMINAL</span>
+          </div>
+        </div>
+        <div class="modal-stat-box">
+          <span class="stat-box-label">ASSET HEALTH</span>
+          <div class="stat-box-val"><span id="modalHealthText">98%</span> <span class="stat-unit">INDEX</span></div>
+        </div>
+      </div>
+
+      <!-- Live Metric Grid Tiles -->
+      <div class="modal-grid-2">
+        <div class="modal-stat-box">
+          <span class="stat-box-label">CORE TEMPERATURE</span>
+          <div class="stat-box-val text-cyan"><span id="modalTemp">21.4</span> <span class="stat-unit">°C</span></div>
+        </div>
+        <div class="modal-stat-box">
+          <span class="stat-box-label">OPERATING LOAD / POWER</span>
+          <div class="stat-box-val text-amber"><span id="modalLoad">68%</span></div>
+        </div>
+        <div class="modal-stat-box">
+          <span class="stat-box-label">PRIMARY BUFFER</span>
+          <div class="stat-box-val text-emerald"><span id="modalBuffer">Nominal</span></div>
+        </div>
+        <div class="modal-stat-box">
+          <span class="stat-box-label">SUBSYSTEM METRIC</span>
+          <div class="stat-box-val text-indigo"><span id="modalSubmetric">Continuous Feed</span></div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <p class="modal-desc" id="modalDesc"></p>
+    </div>
+  </div>
+</div> 
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
 <script src="telemetry.js"></script>
 <script src="map.js"></script>

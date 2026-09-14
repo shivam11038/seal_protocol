@@ -22,8 +22,10 @@
     lblMaitri.classList.toggle("active", current === "maitri");
   }
 
-  stationToggleInput.addEventListener("change", (e) => {
-    Telemetry.switchStation(e.target.checked ? "maitri" : "bharati");
+ stationToggleInput.addEventListener("change", (e) => {
+    const key = e.target.checked ? "maitri" : "bharati";
+    Telemetry.switchStation(key);
+    StationMap.updateStation(key); 
     API.poll();
   });
 

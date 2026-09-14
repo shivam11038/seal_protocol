@@ -616,3 +616,13 @@ html[data-theme="frost-light"] .fixed-right-dock .sketch-dropdown {
     top: calc(100% + 10px) !important;
   }
 }
+
+.map-stage { 
+  position: relative; 
+  border-radius: var(--radius-md); 
+  overflow: hidden; 
+  background: rgba(1, 2, 31, 0.45) !important; 
+  border: 1px solid rgba(255, 255, 255, 0.12) !important; 
+  padding: 0.5rem; 
+  min-height: 350px;
+}
